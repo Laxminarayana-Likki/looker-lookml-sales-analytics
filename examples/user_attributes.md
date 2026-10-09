@@ -1,61 +1,15 @@
-# Looker User Attributes
+# User Attributes
 
-User Attributes allow Looker administrators to store values associated
-with individual users or user groups.
+Typical user attributes:
+- `allowed_branch`: branch identifier used for row-level security
+- `region`: business region
+- `environment`: dev/qa/prod
+- `currency`: reporting currency
 
-They are commonly used for:
-
-- Row-level security
-- Access filters
-- Dynamic database connections
-- Dynamic filtering
-- Liquid templating
-- Environment-specific configuration
-
----
-
-## Example: Region-Based Security
-
-Create a User Attribute:
-
-Name:
-
-user_region
-
-Type:
-
-String
-
-Example values:
-
-Hyderabad
-Chennai
-Bangalore
-
----
-
-## Assigning Values
-
-Example:
-
-| User | user_region |
-|------|-------------|
-| user_a | Hyderabad |
-| user_b | Chennai |
-| user_c | Bangalore |
-
----
-
-## Using the User Attribute
-
-Example LookML:
-
+Example Liquid:
 ```lookml
-explore: orders {
+sql_always_where:
+  ${branches.region} = '{{ _user_attributes['region'] }}' ;;
+```
 
-  access_filter: {
-    field: orders.region
-    user_attribute: user_region
-  }
-
-}
+Use user attributes together with `access_grant`, `sql_always_where`, or templated filters according to your security design.

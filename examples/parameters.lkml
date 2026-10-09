@@ -1,64 +1,22 @@
-view: sales_parameter_example {
+# Example parameter: choose a reporting metric.
+view: parameter_example {
+  derived_table: { sql: SELECT 1 AS id ;;; }
 
-  sql_table_name: analytics.orders ;;
+  dimension: id { primary_key: yes type: number sql: ${TABLE}.id ;; }
 
-  dimension_group: order_date {
-    type: time
-    timeframes: [
-      raw,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.order_date ;;
-  }
-
-  parameter: date_granularity {
-    label: "Date Granularity"
+  parameter: metric_choice {
     type: unquoted
-    allowed_value: {
-      label: "Day"
-      value: "date"
-    }
-    allowed_value: {
-      label: "Week"
-      value: "week"
-    }
-    allowed_value: {
-      label: "Month"
-      value: "month"
-    }
-    allowed_value: {
-      label: "Quarter"
-      value: "quarter"
-    }
-    allowed_value: {
-      label: "Year"
-      value: "year"
-    }
+    allowed_value: { label: "Original Amount" value: "original_amount" }
+    allowed_value: { label: "Outstanding Balance" value: "outstanding_balance" }
   }
 
-  dimension: selected_date {
-    label: "Selected Date"
-    type: date
+  measure: selected_metric {
+    type: number
     sql:
-      CASE
-        WHEN {% parameter date_granularity %} = 'date'
-          THEN ${order_date_date}
-
-        WHEN {% parameter date_granularity %} = 'week'
-          THEN ${order_date_week}
-
-        WHEN {% parameter date_granularity %} = 'month'
-          THEN ${order_date_month}
-
-        WHEN {% parameter date_granularity %} = 'quarter'
-          THEN ${order_date_quarter}
-
-        WHEN {% parameter date_granularity %} = 'year'
-          THEN ${order_date_year}
-      END ;;
+      {% if metric_choice._parameter_value == "'original_amount'" %}
+        100
+      {% else %}
+        80
+      {% endif %} ;;
   }
 }

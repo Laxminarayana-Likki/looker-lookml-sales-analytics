@@ -1,44 +1,17 @@
-view: monthly_sales_summary {
-
+# Derived table examples.
+view: monthly_portfolio_example {
   derived_table: {
-
     sql:
       SELECT
-        DATE_TRUNC(order_date, MONTH) AS order_month,
-        COUNT(DISTINCT order_id) AS order_count,
-        COUNT(DISTINCT customer_id) AS customer_count,
-        SUM(sales_amount) AS total_sales
-      FROM `analytics.orders`
-      GROUP BY 1
-      ORDER BY 1 ;;
-
+        DATE_TRUNC(origination_date, MONTH) AS month,
+        COUNT(*) AS loan_count,
+        SUM(outstanding_balance) AS balance
+      FROM banking.loans
+      GROUP BY 1 ;;
     persist_for: "24 hours"
   }
 
-  dimension_group: order_month {
-    type: time
-    timeframes: [
-      date,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.order_month ;;
-  }
-
-  dimension: order_count {
-    type: number
-    sql: ${TABLE}.order_count ;;
-  }
-
-  dimension: customer_count {
-    type: number
-    sql: ${TABLE}.customer_count ;;
-  }
-
-  measure: total_sales {
-    type: sum
-    sql: ${TABLE}.total_sales ;;
-    value_format_name: usd
-  }
+  dimension_group: month { type: time timeframes: [date, month] sql: ${TABLE}.month ;; }
+  dimension: loan_count { type: number sql: ${TABLE}.loan_count ;; }
+  dimension: balance { type: number value_format_name: "usd" sql: ${TABLE}.balance ;; }
 }
